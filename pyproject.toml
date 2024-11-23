@@ -1,13 +1,18 @@
 [tool.poetry]
 name = "paperboy"
 version = "0.1.0"
-description = ""
-authors = ["alexbracken <ajbracken@bsu.edu>"]
+description = "A simple script for posting news stories to social media"
+authors = ["alexbracken <alex@alexbracken.co>"]
 readme = "README.md"
 package-mode = false
 
+
 [tool.poetry.dependencies]
-python = "^3.13"
+python = "^3.10"
+python-facebook-api = "^0.20.1"
+feedparser = "^6.0.11"
+requests = "^2.32.3"
+python-dotenv = "^1.0.1"
 
 
 [build-system]
