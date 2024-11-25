@@ -1,4 +1,6 @@
 .env
 .DS_Store
 /.vscode
-/__pycache__
+__pycache__
+*/__pycache__
+posted_ids.json
