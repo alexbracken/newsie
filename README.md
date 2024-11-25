@@ -5,3 +5,7 @@ A minimal, utility-focused script for posting news to social media platforms usi
 - Python (tested on 3.14)
 - Poetry (dependency management)
     - View pyproject.toml full dependencies
+
+
+## Setup
+- Coming soon
