@@ -1,11 +1,16 @@
 # Paper Boy
-A minimal, utility-focused script for posting news to social media platforms using a customizable queue-based system.
+A barebones Python script for posting news to social media platforms. Designed for simplicity, ease of use, and cost-effectiveness, so journalists can focus on reporting.
 
-### Dependencies
+## Dependencies
 - Python (tested on 3.14)
 - Poetry (dependency management)
-    - View pyproject.toml full dependencies
-
+    - View pyproject.toml for full dependencies
 
 ## Setup
-- Coming soon
+- _Coming soon_
+
+## Potential Enhancements
+- Smart Slots
+    - Calculate engagement rates by time, concentrate slots based on that model
+- AI-enhanced captions
+    - Use locally-hosted LLM or API key
