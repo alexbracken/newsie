@@ -4,7 +4,7 @@ from typing import List, Set
 from dotenv import load_dotenv
 from pyfacebook import GraphAPI
 import feedparser
-from datetime import datetime, timedelta
+import logging
 
 class PostTracker:
     def __init__(self, tracking_file: str = 'posted.json'):
@@ -75,34 +75,72 @@ class PostTracker:
         
         # Save to file
         self._save_posted_ids()
-
-class FacebookPoster:
-
-    def _create_queue(self, posts_per_day: int, day_start: int, day_end: int) -> List:
+    
+class QueueManager():
+    def __init__(self, posts_per_day: int, day_start: int, day_end: int):
         """
-        Create queue for Facebook posting
+        Initialize queue manager
         
         :param posts_per_day: Number of posts/day
         :param day_start: First post time in 24H format
         :param day_end: Last post time in 24H format
+        """
+        self.posts_per_day = posts_per_day
+        self.day_start = day_start
+        self.day_end = day_end
+        
+        self.construct_queue()
+     
+    def construct_queue(self) -> List[float]:
+        """
+        Create queue for Facebook posting
         
         :return: List of slots for posts
         """
-        #  
-        if posts_per_day == 1:
-            return [day_start]
+        # Handle edge case for one post per day
+        if self.posts_per_day == 1:
+            return [self.day_start]
         
-        # Calculate interval between slots
-        n = (day_end - day_start) / (posts_per_day - 1)
-        
-        slots = [day_start + i * n for i in range(posts_per_day)]
-    
-        # Ensure last slot is exactly day_end
-        slots[-1] = day_end
-        
+        n = (self.day_end - self.day_start) / (self.posts_per_day - 1)
+        slots = [self.day_start + i * n for i in range(self.posts_per_day)]
+        slots[-1] = self.day_end # Ensure last slot is exactly day_end
+
         return slots
-    
-    def create_posts(self, unposted_items: List[dict], page_id: str):
+
+class FacebookPoster():
+    def __init__(self, page_id: str):
+        """
+        Initialize Facebook Poster
+        
+        :param page_id: Target Facebook page ID
+        :param queue: Queue settings from create_queue method
+        """
+        self.page_id = page_id
+        
+    def _organize_posts(self):
+        unposted_items = self.unposted_items
+        
+    def create_posts(self, unposted_items: List[dict], slots: List):
+        for item in unposted_items:
+            
+            params= {"fields": "id,message,created_time,from"},
+            
+            # Test for existence of items
+            if 'title' in item:
+                title = item.title
+            if 'link' in item:
+                link = item.link
+            if 'summary' in item:
+                summary = item.summary
+            
+            data: dict = {
+                'message': summary,
+                'published': "false"
+                
+            }
+        
+    def send_posts(self):
+        page_id = self.page_id
         
         # Import environment variables
         load_dotenv()
@@ -113,46 +151,38 @@ class FacebookPoster:
             app_secret = os.getenv("APP_SECRET"),
             access_token=os.getenv("ACCESS_TOKEN")
         )
-        # TODO Create posting logic
-        for item in unposted_items:
-            
-            params= {"fields": "id,message,created_time,from"},
-            
-            # Test for existence of items
-            if 'title' in item:
-                title = item.title
-            link = item.link
-            summary = item.summary
-            
-            post: dict = {
-                'body': summary,
-            }
-            
-            """
-            fb.post_object(
-                page_id,
-                connection="feed",
-                data={
-                    "message": "This is a tests message by api"
-                    },
-            )
-            """
-            
+        """"
+        fb.post_object(
+            page_id,
+            data,
+            connection="feed",
+        )
+        """    
 
 class FeedScraper:
-    def read_rss(self, url: str, agent: str) -> List[dict]:
+    def __init__(self, url: str, agent: str):
+        """
+        Initialize FeedScraper instance
+        
+        :param agent: User agent for GET requests
+        :param url: RSS feed URL
+        """
+        self.url = url
+        self.agent = agent
+        
+        self.read_rss()
+    
+    def read_rss(self) -> List[dict]:
         """
         Scrape RSS feeds
         
         :param ids: List of IDs to mark as posted
         :param max_tracked_ids: Maximum number of IDs to keep track of
         """
-        
-        url = url
-        agent = agent
         d = feedparser.parse(
-            url,
-            request_headers = {'User-agent':agent}
+            self.url,
+            request_headers = {
+                'User-agent': self.agent
+            }
         )
-        
         return d.entries
