@@ -4,15 +4,12 @@ from helpers import *
 
 def main():
 
-    version = 0.1
-
     # RSS Source Configuration
     source = FeedScraper(
-        agent = 'paperboy 0.1', # User agent for HTTP requests
+        agent = 'newsie', # User agent for HTTP requests
         url = 'https://www.chronicle-tribune.com/search/?k=%23free&s=&f=atom&altf=mrss&ips=1080&l=100'
     )
-
-    debug = True
+    
     # Queue Configuration
     queue = QueueManager(
         posts_per_day = 6, # Number of posts per day (int)
@@ -20,7 +17,7 @@ def main():
         day_end = 18 # Last post time (int)
         )
     
-    # Facebook Configuration
+    # Facebook Configuration (see .env for more)
     fb = FacebookPoster(
         page_id = "",
         )

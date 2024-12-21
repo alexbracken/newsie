@@ -4,7 +4,6 @@ from typing import List, Set
 from dotenv import load_dotenv
 from pyfacebook import GraphAPI
 import feedparser
-import logging
 
 class PostTracker:
     def __init__(self, tracking_file: str = 'posted.json'):
@@ -116,16 +115,55 @@ class FacebookPoster():
         :param queue: Queue settings from create_queue method
         """
         self.page_id = page_id
+        self.fb = self._auth_facebook()
         
-    def _organize_posts(self):
-        unposted_items = self.unposted_items
+    def _auth_facebook(self) -> GraphAPI:
+
+        load_dotenv()
+        app_id = os.getenv("APP_ID")
+        app_secret = os.getenv("APP_SECRET")
+        access_token=os.getenv("ACCESS_TOKEN")
         
-    def create_posts(self, unposted_items: List[dict], slots: List):
+        if not app_id or not app_secret or not access_token:
+            raise ValueError("Missing Facebook credentials. Check .env file.")
+        
+        fb = GraphAPI(app_id, app_secret, access_token)
+        return fb
+        
+    def create_posts(self, unposted_items: List[dict]):
+        """
+        Create data for Facebook posts
+
+        :param unposted_items: Items to be posted
+        :return: 
+        """
+        fb = self.fb
         for item in unposted_items:
-            
-            params= {"fields": "id,message,created_time,from"},
-            
             # Test for existence of items
+            if 'title' not in item:
+                raise KeyError('')
+            else:
+                item.titlez
+            if 'link' not in item:
+                raise KeyError(f'')
+            if 'summary' not in item:
+                raise KeyError('')
+            
+            data: dict = {
+                'message': summary,
+                'published': "false"
+            }
+        return data
+    
+    def send_posts(self, slots: List):
+        """
+        Connect to Facebook Graph API and publish posts
+        """
+        page_id = self.page_id
+        
+        for item in unposted_items:
+            # Test for existence of fields
+                # TODO Need warning for missing fields
             if 'title' in item:
                 title = item.title
             if 'link' in item:
@@ -136,21 +174,9 @@ class FacebookPoster():
             data: dict = {
                 'message': summary,
                 'published': "false"
-                
             }
-        
-    def send_posts(self):
-        page_id = self.page_id
-        
-        # Import environment variables
-        load_dotenv()
-        
-        # GraphAPI configuration
-        fb = GraphAPI(
-            app_id = os.getenv("APP_ID"),
-            app_secret = os.getenv("APP_SECRET"),
-            access_token=os.getenv("ACCESS_TOKEN")
-        )
+    
+       
         """"
         fb.post_object(
             page_id,
