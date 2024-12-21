@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "paperboy"
+name = "newsie"
 version = "0.1.0"
 description = "A simple script for posting news stories to social media"
 authors = ["alexbracken <alex@alexbracken.co>"]
