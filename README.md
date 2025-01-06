@@ -11,6 +11,7 @@ A barebones Python script for posting news to social media platforms. Designed f
 
 ## References
 - [GraphAPI Page Feed Reference](https://developers.facebook.com/docs/graph-api/reference/v21.0/page/feed)
+- [GraphAPI Photo Reference](https://developers.facebook.com/docs/graph-api/reference/page/photos/#upload)
 
 ## TODO
 - Error logging
