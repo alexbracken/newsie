@@ -4,6 +4,8 @@ from typing import List, Set
 from dotenv import load_dotenv
 from pyfacebook import GraphAPI
 import feedparser
+from urllib.parse import urlparse, urlunparse
+
 
 class PostTracker:
     def __init__(self, tracking_file: str = 'posted.json'):
@@ -88,9 +90,9 @@ class QueueManager():
         self.day_start = day_start
         self.day_end = day_end
         
-        self.construct_queue()
+        self.queue = self._construct_queue()
      
-    def construct_queue(self) -> List[float]:
+    def _construct_queue(self) -> List[float]:
         """
         Create queue for Facebook posting
         
@@ -126,64 +128,57 @@ class FacebookPoster():
         
         if not app_id or not app_secret or not access_token:
             raise ValueError("Missing Facebook credentials. Check .env file.")
-        
-        fb = GraphAPI(app_id, app_secret, access_token)
-        return fb
-        
-    def create_posts(self, unposted_items: List[dict]):
-        """
-        Create data for Facebook posts
 
-        :param unposted_items: Items to be posted
-        :return: 
-        """
-        fb = self.fb
-        for item in unposted_items:
-            # Test for existence of items
-            if 'title' not in item:
-                raise KeyError('')
-            else:
-                item.titlez
-            if 'link' not in item:
-                raise KeyError(f'')
-            if 'summary' not in item:
-                raise KeyError('')
-            
-            data: dict = {
-                'message': summary,
-                'published': "false"
-            }
-        return data
+        fb = GraphAPI(app_id, app_secret, access_token)
+        
+        return fb
     
-    def send_posts(self, slots: List):
+    def _strip_url(self, url: str) -> str:
         """
-        Connect to Facebook Graph API and publish posts
+        Remove query parameters from URL
+        
+        :param url: URL to be stripped
+        :return: URL without query parameters
+        """
+        parsed_url = urlparse(url)
+        return urlunparse(parsed_url._replace(query=""))
+    
+    def send_posts(self, slots: List, unposted_items: List[dict]):
+        """
+        :param slots: List of slots for posts
         """
         page_id = self.page_id
+        fb = self.fb
         
-        for item in unposted_items:
-            # Test for existence of fields
-                # TODO Need warning for missing fields
-            if 'title' in item:
-                title = item.title
-            if 'link' in item:
-                link = item.link
-            if 'summary' in item:
-                summary = item.summary
+        for item in unposted_items[:3]:
+            # TODO: Add error handling for missing keys
+            title = item.title
+            link = item.link
+            summary = item.summary
             
-            data: dict = {
-                'message': summary,
-                'published': "false"
-            }
-    
-       
-        """"
-        fb.post_object(
-            page_id,
-            data,
-            connection="feed",
-        )
-        """    
+            if 'media_content' in item and item.media_content: # Post with media
+                media_url = self._strip_url(item.media_content[0]['url'])
+                post_content: dict = {
+                    'caption': summary,
+                    'url': media_url,
+                    'published': "true",
+                }
+                fb.post_object(
+                    object_id = page_id,
+                    data = post_content,
+                    connection = "photos"
+                    )
+            else: # Post with link
+                post_content: dict = {
+                    'message': summary + "LINKPOST",
+                    'link': link,
+                    'published': "true",
+                }
+                fb.post_object(
+                    object_id = page_id,
+                    data = post_content,
+                    connection = "feed"
+                )
 
 class FeedScraper:
     def __init__(self, url: str, agent: str):
@@ -196,9 +191,9 @@ class FeedScraper:
         self.url = url
         self.agent = agent
         
-        self.read_rss()
+        self.entries = self._read_rss()
     
-    def read_rss(self) -> List[dict]:
+    def _read_rss(self) -> List[dict]:
         """
         Scrape RSS feeds
         
