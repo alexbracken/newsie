@@ -1,7 +1,7 @@
 # Newsie
-A barebones Python script for posting news to social media platforms. Designed for simplicity, ease of use, and cost-effectiveness, so journalists can focus on reporting.
+A barebones, no-nonsense Python script for posting news stories to social media platforms. Designed for simplicity, ease of use, and cost-effectiveness, so journalists can focus on reporting.
 
-* Currently under development. This script may or may not work and has not been tested extensively. *
+  _Currently under active development. This script may or may not work and has not been tested extensively._
 
 ## Dependencies
 - Python (tested on 3.14)
