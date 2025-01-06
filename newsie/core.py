@@ -19,19 +19,18 @@ def main():
     
     # Facebook Configuration (see .env for more)
     fb = FacebookPoster(
-        page_id = "",
+        page_id = "568163179705403",
         )
     
-    currency_limit = 2 # Max number of days after publish (int) 
+    # Max number of days after publish (int) 
+    currency_limit = 2 
     
     tracker = PostTracker()
     
     unposted_items = []
     unposted_ids = []
-    
-    entries = source.read_rss()
 
-    for entry in entries:
+    for entry in source.entries:
         # If entry.id is not in posted_ids.json 
         if tracker.get_unposted_ids([entry.id]):
             # Add item dict and id to respective list
@@ -41,11 +40,10 @@ def main():
     
     # Process unposted items
     if unposted_items:
-        slots = queue.construct_queue()
+        slots = queue._construct_queue()
+
+        fb.send_posts(slots, unposted_items)
         
-        print(f"Found {len(unposted_items)} unposted items")
-        
-        fb.create_posts(unposted_items, slots)
         # fb.add_to_queue(unposted_items)
                     
         # After successful posting, mark as posted
