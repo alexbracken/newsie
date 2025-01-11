@@ -6,22 +6,31 @@ def main():
 
     # RSS Source Configuration
     source = FeedScraper(
-        agent = 'newsie', # User agent for HTTP requests
-        url = 'https://www.chronicle-tribune.com/search/?k=%23free&s=&f=atom&altf=mrss&ips=1080&l=100'
+        agent = 'newsie',
+        url = 'https://www.heraldpalladium.com/search/',
+        params = {
+            'k': '#free',
+            'q': 'news',
+            't': 'article',
+            'f': 'atom',
+            'altf': 'mrss',
+            'nsa': 'eedition',
+        }
     )
     
     # Queue Configuration
     queue = QueueManager(
-        posts_per_day = 6, # Number of posts per day (int)
-        day_start = 7, # First post time (int)
-        day_end = 18 # Last post time (int)
+        posts_per_day = 6,
+        day_start = 7,
+        day_end = 18
         )
     
     # Facebook Configuration (see .env for more)
     fb = FacebookPoster(
         page_id = "568163179705403",
+        post_type = "image",
+        kicker = "Read more:",
         )
-    
     # Max number of days after publish (int) 
     currency_limit = 2 
     
@@ -43,11 +52,9 @@ def main():
         slots = queue._construct_queue()
 
         fb.send_posts(slots, unposted_items)
-        
-        # fb.add_to_queue(unposted_items)
-                    
         # After successful posting, mark as posted
-        # tracker.mark_as_posted(unposted_ids) 
+        
+        tracker.mark_as_posted(unposted_ids) 
 
 if __name__ == '__main__':
     main()
